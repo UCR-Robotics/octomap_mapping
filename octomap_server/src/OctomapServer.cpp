@@ -178,6 +178,7 @@ OctomapServer::OctomapServer(const ros::NodeHandle private_nh_, const ros::NodeH
 
   m_octomapBinaryService = m_nh.advertiseService("octomap_binary", &OctomapServer::octomapBinarySrv, this);
   m_octomapFullService = m_nh.advertiseService("octomap_full", &OctomapServer::octomapFullSrv, this);
+  m_searchOctomapService = m_nh.advertiseService("search_octomap", &OctomapServer::octomapSearchSrv, this);
   m_clearBBXService = m_nh_private.advertiseService("clear_bbx", &OctomapServer::clearBBXSrv, this);
   m_resetService = m_nh_private.advertiseService("reset", &OctomapServer::resetSrv, this);
 
@@ -795,6 +796,29 @@ bool OctomapServer::resetSrv(std_srvs::Empty::Request& req, std_srvs::Empty::Res
   return true;
 }
 
+bool OctomapServer::octomapSearchSrv(SearchOctomapSrv::Request& req, SearchOctomapSrv::Response& resp) {
+  // for (auto point : req.positions){
+    // point3d query(point.x, point.y, point.z);
+    point3d query(req.position.x, req.position.y, req.position.z);
+    OcTreeNode* result = m_octree->search(query);
+    if(result) {
+      resp.nodeFound = true;
+      double p = result->getOccupancy();
+      if (p > .5) {
+        resp.occupied = true;
+      }
+      else { 
+        resp.occupied = false;
+      }
+    }
+    else {
+      resp.nodeFound = false;
+      ROS_ERROR("Node is unknown");
+    }
+  // }
+  return true;
+}
+
 void OctomapServer::publishBinaryOctoMap(const ros::Time& rostime) const{
 
   Octomap map;
@@ -1274,6 +1298,7 @@ std_msgs::ColorRGBA OctomapServer::heightMapColor(double h) {
 
   return color;
 }
+
 }
 
 

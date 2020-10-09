@@ -66,6 +66,8 @@
 #include <octomap/octomap.h>
 #include <octomap/OcTreeKey.h>
 
+#include "octomap_server/SearchOctomapSrv.h"
+
 //#define COLOR_OCTOMAP_SERVER // switch color here - easier maintenance, only maintain OctomapServer. Two targets are defined in the cmake, octomap_server_color and octomap_server. One has this defined, and the other doesn't
 
 #ifdef COLOR_OCTOMAP_SERVER
@@ -87,6 +89,7 @@ public:
 #endif
   typedef octomap_msgs::GetOctomap OctomapSrv;
   typedef octomap_msgs::BoundingBoxQuery BBXSrv;
+  // OcTreeSearch SearchSrv;
 
   OctomapServer(const ros::NodeHandle private_nh_ = ros::NodeHandle("~"), const ros::NodeHandle &nh_ = ros::NodeHandle());
   virtual ~OctomapServer();
@@ -94,6 +97,7 @@ public:
   virtual bool octomapFullSrv(OctomapSrv::Request  &req, OctomapSrv::GetOctomap::Response &res);
   bool clearBBXSrv(BBXSrv::Request& req, BBXSrv::Response& resp);
   bool resetSrv(std_srvs::Empty::Request& req, std_srvs::Empty::Response& resp);
+  bool octomapSearchSrv(SearchOctomapSrv::Request& req, SearchOctomapSrv::Response& resp);
 
   virtual void insertCloudCallback(const sensor_msgs::PointCloud2::ConstPtr& cloud);
   virtual bool openFile(const std::string& filename);
@@ -203,7 +207,7 @@ protected:
   ros::Publisher  m_markerPub, m_binaryMapPub, m_fullMapPub, m_pointCloudPub, m_collisionObjectPub, m_mapPub, m_cmapPub, m_fmapPub, m_fmarkerPub;
   message_filters::Subscriber<sensor_msgs::PointCloud2>* m_pointCloudSub;
   tf::MessageFilter<sensor_msgs::PointCloud2>* m_tfPointCloudSub;
-  ros::ServiceServer m_octomapBinaryService, m_octomapFullService, m_clearBBXService, m_resetService;
+  ros::ServiceServer m_octomapBinaryService, m_octomapFullService, m_clearBBXService, m_resetService, m_searchOctomapService;
   tf::TransformListener m_tfListener;
   boost::recursive_mutex m_config_mutex;
   dynamic_reconfigure::Server<OctomapServerConfig> m_reconfigureServer;
