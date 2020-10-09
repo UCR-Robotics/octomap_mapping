@@ -1,8 +1,10 @@
 cmake_minimum_required(VERSION 2.8)
 project(octomap_server)
+add_compile_options(-std=c++11)
 
 set(PACKAGE_DEPENDENCIES
   roscpp
+  message_generation
   visualization_msgs
   sensor_msgs
   pcl_ros
@@ -17,10 +19,27 @@ set(PACKAGE_DEPENDENCIES
 )
 
 
-find_package(catkin REQUIRED COMPONENTS ${PACKAGE_DEPENDENCIES})
+find_package(catkin REQUIRED COMPONENTS 
+  ${PACKAGE_DEPENDENCIES}
+)
 
 find_package(octomap REQUIRED)
 add_definitions(-DOCTOMAP_NODEBUGOUT)
+
+# Generate services in the 'srv' folder
+# add_message_files()
+
+add_service_files(
+  FILES
+  SearchOctomapSrv.srv
+)
+
+## Generate added messages and services with any dependencies listed here
+generate_messages(
+  DEPENDENCIES 
+  std_msgs
+  geometry_msgs
+)
 
 include_directories(
   include
